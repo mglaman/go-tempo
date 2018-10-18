@@ -18,11 +18,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/briandowns/spinner"
 	"github.com/mglaman/tempo/pkg/tempo"
 	"github.com/mglaman/tempo/pkg/util"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"gopkg.in/cheggaaa/pb.v1"
 	"net/http"
 	"os"
 	"os/signal"
@@ -53,13 +53,14 @@ var timerCmd = &cobra.Command{
 		start := time.Now()
 		running = true
 
-		bar := pb.StartNew(10)
-		bar.SetRefreshRate(time.Second)
+		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
+		s.Start()
+		s.Color("white", "bold")
+		s.Suffix = " Timer is running…"
 		for running == true {
-			bar.Increment()
 			time.Sleep(time.Second)
 		}
-		bar.Finish()
+		s.Stop()
 		elapsed := time.Since(start)
 
 		// Round up to 15 minutes if less than 15 minutes..
@@ -68,7 +69,7 @@ var timerCmd = &cobra.Command{
 		}
 		// Round off all timers to 15 minute intervals.
 		elapsed = elapsed.Round(time.Minute * 15)
-
+		fmt.Println()
 		fmt.Println(fmt.Sprintf("Logging %s", elapsed))
 		fmt.Println()
 		issueKey := util.Prompt("Enter the issue key")
