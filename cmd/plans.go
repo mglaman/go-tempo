@@ -17,6 +17,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/mglaman/tempo/pkg/tempo"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -25,56 +26,13 @@ import (
 	"time"
 )
 
-type PlanPeriod struct {
-	From string
-	To   string
-	// Define as a float so we can convert it to hours and allow a decimal.
-	TimePlannedSeconds float32
-}
-
-type Plans struct {
-	Self        string
-	Id          int
-	StartDate   string
-	EndDate     string
-	CreatedAt   string
-	Description string
-	UpdatedAt   string
-	Assignee    struct {
-		Self string
-		Type string
-	}
-	PlanItem struct {
-		Self string
-		Type string
-	}
-	Recurrence struct {
-		Rule              string
-		RecurrenceEndDate string
-	}
-	Dates struct {
-		Metadata struct {
-			Count int
-			All   string
-		}
-		Values []PlanPeriod
-	}
-}
-type PlansResponse struct {
-	Self     string
-	Metadata struct {
-		Count int
-	}
-	Results []Plans
-}
-
 // plansCmd represents the plans command
 var plansCmd = &cobra.Command{
 	Use:   "plans",
 	Short: "Retrieve your work plans for the day",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		time := time.Now().Local().Format("2006-01-02");
+		time := time.Now().Local().Format("2006-01-02")
 		token := viper.GetString("token")
 		username := viper.GetString("username")
 		url := "https://api.tempo.io/2/plans/user/" + username + "?from=" + time + "&to=" + time
@@ -91,14 +49,13 @@ var plansCmd = &cobra.Command{
 
 		totalHours := float32(0)
 
-		plans := new(PlansResponse)
+		plans := new(tempo.PlanCollection)
 		_ = json.NewDecoder(resp.Body).Decode(plans)
-		//fmt.Println(plans.Results)
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetBorders(tablewriter.Border{Left: true, Top: true, Right: true, Bottom: false})
 		table.SetCenterSeparator("|")
 		table.SetColMinWidth(0, 50)
-		table.SetColWidth( 50)
+		table.SetColWidth(50)
 		table.SetHeader([]string{"Description", "Hours"})
 		for _, plan := range plans.Results {
 			for _, planItem := range plan.Dates.Values {
@@ -106,7 +63,7 @@ var plansCmd = &cobra.Command{
 					plan.Description,
 					fmt.Sprintf("%v", planItem.TimePlannedSeconds/60/60),
 				})
-				totalHours += planItem.TimePlannedSeconds / 60 / 60;
+				totalHours += planItem.TimePlannedSeconds / 60 / 60
 			}
 		}
 		table.SetFooter([]string{

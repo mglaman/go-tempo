@@ -17,56 +17,16 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/mglaman/tempo/pkg/tempo"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/ssh/terminal"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/spf13/cobra"
 )
-
-type WorkAttributeValue struct {
-	Key   string
-	Value string
-}
-type User struct {
-	Self        string
-	Username    string
-	DisplayName string
-}
-type Worklog struct {
-	Self           string
-	TempoWorklogId int
-	JiraWorklogId  int
-	Issue          struct {
-		Self string
-		Key  string
-	}
-	// Set to float so we can perform math
-	TimeSpentSeconds float32
-	StartDate        string
-	StartTime        string
-	Description      string
-	CreatedAt        string
-	UpdatedAt        string
-	Author           User
-	Attributes       struct {
-		Self  string
-		Items []WorkAttributeValue
-	}
-}
-type LogsResponse struct {
-	Self     string
-	Metadata struct {
-		Count    int
-		Offset   int
-		Limit    int
-		Next     string
-		Previous string
-	}
-	Results []Worklog
-}
 
 // worklogsCmd represents the logs command
 var worklogsCmd = &cobra.Command{
@@ -92,14 +52,15 @@ var worklogsCmd = &cobra.Command{
 		}
 		totalHours := float32(0)
 
-		worklogs := new(LogsResponse)
+		worklogs := new(tempo.WorklogCollection)
 		_ = json.NewDecoder(resp.Body).Decode(worklogs)
 
+		width, _, _ := terminal.GetSize(0)
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetBorders(tablewriter.Border{Left: true, Top: true, Right: true, Bottom: false})
 		table.SetCenterSeparator("|")
-		table.SetColMinWidth(1, 75)
-		table.SetColWidth(75)
+		table.SetColWidth(width - 25)
+		table.SetAutoWrapText(true)
 		table.SetHeader([]string{"Issue", "Description", "Hours"})
 		for _, worklog := range worklogs.Results {
 			table.Append([]string{
@@ -116,7 +77,8 @@ var worklogsCmd = &cobra.Command{
 
 		if totalHours < 8 {
 			fmt.Println()
-			fmt.Printf("Watch out! You have only logged %v of 8 hours today", totalHours)
+			fmt.Print(fmt.Sprintf("Watch out! You have only logged %v of 8 hours today", totalHours))
+			fmt.Println()
 		}
 	},
 }

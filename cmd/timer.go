@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/mglaman/tempo/pkg/tempo"
 	"github.com/mglaman/tempo/pkg/util"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -28,16 +29,6 @@ import (
 	"syscall"
 	"time"
 )
-
-type WorklogPayload struct {
-	IssueKey         string  `json:"issueKey"`
-	TimeSpentSeconds float64 `json:"timeSpentSeconds"`
-	BillableSeconds  float64 `json:"billableSeconds"`
-	StartDate        string  `json:"startDate"`
-	StartTime        string  `json:"startTime"`
-	Description      string  `json:"description"`
-	AuthorUsername   string  `json:"authorUsername"`
-}
 
 var running = false
 
@@ -84,7 +75,7 @@ var timerCmd = &cobra.Command{
 		description := util.Prompt("Worklog description")
 		time := time.Now().Local()
 
-		workLog := WorklogPayload{
+		workLog := tempo.WorklogPayload{
 			IssueKey:         issueKey,
 			TimeSpentSeconds: elapsed.Seconds(),
 			BillableSeconds:  elapsed.Seconds(),
@@ -105,7 +96,7 @@ var timerCmd = &cobra.Command{
 			panic(err.Error())
 		}
 
-		worklog := new(Worklog)
+		worklog := new(tempo.Worklog)
 		_ = json.NewDecoder(resp.Body).Decode(worklog)
 
 		fmt.Println("Time log submitted!")
