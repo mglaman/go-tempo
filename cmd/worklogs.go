@@ -33,7 +33,6 @@ var worklogsCmd = &cobra.Command{
 	Use:   "worklogs",
 	Short: "Retrieve todays worklogs",
 	Long: `Retrieves your worklogs for the current day, limited to 50
-
 @todo: support specifying days, date range, and pagination.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		time := time.Now().Local().Format("2006-01-02")

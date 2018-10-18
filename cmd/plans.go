@@ -28,14 +28,33 @@ import (
 
 // plansCmd represents the plans command
 var plansCmd = &cobra.Command{
-	Use:   "plans",
-	Short: "Retrieve your work plans for the day",
-	Long:  ``,
+	Use:       "plans",
+	Short:     "Retrieve your work plans for the day",
+	Long:      ``,
+	ValidArgs: []string{"yesterday", "today", "tomorrow"},
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) != 1 {
+			return nil
+		}
+		return cobra.OnlyValidArgs(cmd, args)
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-		time := time.Now().Local().Format("2006-01-02")
+		var queryTime = time.Now()
+		if len(args) > 0 {
+			if args[0] == "yesterday" {
+				queryTime = queryTime.AddDate(0, 0, -1).Local()
+			} else if args[0] == "tomorrow" {
+				queryTime = queryTime.AddDate(0, 0, 1).Local()
+			} else {
+				queryTime = queryTime.AddDate(0, 0, 0).Local()
+			}
+		}
+
+		fmt.Println(queryTime.Format("2006-01-02"))
+
 		token := viper.GetString("token")
 		username := viper.GetString("username")
-		url := "https://api.tempo.io/2/plans/user/" + username + "?from=" + time + "&to=" + time
+		url := "https://api.tempo.io/2/plans/user/" + username + "?from=" + queryTime.Format("2006-01-02") + "&to=" + queryTime.Format("2006-01-02")
 
 		req, _ := http.NewRequest("GET", url, nil)
 		req.Header.Add("Authorization", "Bearer "+token)
