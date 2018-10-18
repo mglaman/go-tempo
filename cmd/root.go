@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -29,7 +29,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "tempo",
 	Short: "Command line integration for Tempo",
-	Long: `Allows you to interact with Tempo from the command line allowing you to log time from your console.`,
+	Long:  `Allows you to interact with Tempo from the command line allowing you to log time from your console.`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
