@@ -53,6 +53,7 @@ var timerCmd = &cobra.Command{
 		start := time.Now()
 		running = true
 
+		fmt.Print("\x1b[?25l")
 		s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 		s.Start()
 		s.Color("white", "bold")
@@ -62,10 +63,11 @@ var timerCmd = &cobra.Command{
 		}
 		s.Stop()
 		elapsed := time.Since(start)
+		fmt.Print("\x1b[?25h")
 
 		// Round up to 15 minutes if less than 15 minutes..
 		if elapsed.Minutes() < 15 {
-			elapsed = time.Duration(int64(time.Minute) * 15)
+			elapsed = time.Duration(int64(time.Minute * 15))
 		}
 		// Round off all timers to 15 minute intervals.
 		elapsed = elapsed.Round(time.Minute * 15)
@@ -74,14 +76,13 @@ var timerCmd = &cobra.Command{
 		fmt.Println()
 		issueKey := util.Prompt("Enter the issue key")
 		description := util.Prompt("Worklog description")
-		time := time.Now().Local()
 
 		workLog := tempo.WorklogPayload{
 			IssueKey:         issueKey,
 			TimeSpentSeconds: elapsed.Seconds(),
 			BillableSeconds:  elapsed.Seconds(),
-			StartDate:        time.Format("2006-01-02"),
-			StartTime:        time.Format("15:04:05"),
+			StartDate:        start.Local().Format("2006-01-02"),
+			StartTime:        start.Local().Format("15:04:05"),
 			Description:      description,
 			AuthorUsername:   viper.GetString("username"),
 		}
