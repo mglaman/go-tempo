@@ -50,8 +50,6 @@ var plansCmd = &cobra.Command{
 			}
 		}
 
-		fmt.Println(queryTime.Format("2006-01-02"))
-
 		token := viper.GetString("token")
 		username := viper.GetString("username")
 		url := "https://api.tempo.io/2/plans/user/" + username + "?from=" + queryTime.Format("2006-01-02") + "&to=" + queryTime.Format("2006-01-02")

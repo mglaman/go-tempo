@@ -67,7 +67,7 @@ var timerCmd = &cobra.Command{
 
 		// Round up to 15 minutes if less than 15 minutes..
 		if elapsed.Minutes() < 15 {
-			elapsed = time.Duration(int64(time.Minute * 15))
+			elapsed = time.Duration(time.Minute * 15)
 		}
 		// Round off all timers to 15 minute intervals.
 		elapsed = elapsed.Round(time.Minute * 15)
