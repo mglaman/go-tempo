@@ -17,13 +17,14 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/mglaman/tempo/pkg/tempo"
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/ssh/terminal"
-	"net/http"
-	"os"
-	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -38,7 +39,7 @@ var worklogsCmd = &cobra.Command{
 		time := time.Now().Local().Format("2006-01-02")
 		token := viper.GetString("token")
 		username := viper.GetString("username")
-		url := "https://api.tempo.io/2/worklogs/user/" + username + "?from=" + time + "&to=" + time
+		url := "https://api.tempo.io/core/3/worklogs/user/" + username + "?from=" + time + "&to=" + time
 
 		req, _ := http.NewRequest("GET", url, nil)
 		req.Header.Add("Authorization", "Bearer "+token)

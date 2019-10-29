@@ -45,5 +45,5 @@ type WorklogPayload struct {
 	StartDate        string  `json:"startDate"`
 	StartTime        string  `json:"startTime"`
 	Description      string  `json:"description"`
-	AuthorUsername   string  `json:"authorUsername"`
+	AuthorAccountID  string  `json:"authorAccountId"`
 }

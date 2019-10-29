@@ -18,16 +18,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/briandowns/spinner"
-	"github.com/mglaman/tempo/pkg/tempo"
-	"github.com/mglaman/tempo/pkg/util"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/briandowns/spinner"
+	"github.com/mglaman/tempo/pkg/tempo"
+	"github.com/mglaman/tempo/pkg/util"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var running = false
@@ -58,9 +60,9 @@ var timerCmd = &cobra.Command{
 		s.Start()
 		s.Color("white", "bold")
 		s.Suffix = " Timer is running…"
-		for running == true {
-			time.Sleep(time.Second)
-		}
+		//for running == true {
+		time.Sleep(time.Second)
+		//}
 		s.Stop()
 		elapsed := time.Since(start)
 		fmt.Print("\x1b[?25h")
@@ -84,10 +86,10 @@ var timerCmd = &cobra.Command{
 			StartDate:        start.Local().Format("2006-01-02"),
 			StartTime:        start.Local().Format("15:04:05"),
 			Description:      description,
-			AuthorUsername:   viper.GetString("username"),
+			AuthorAccountID:  viper.GetString("username"),
 		}
 
-		url := "https://api.tempo.io/2/worklogs"
+		url := "https://api.tempo.io/core/3/worklogs"
 		j, _ := json.Marshal(workLog)
 		req, _ := http.NewRequest("POST", url, bytes.NewBuffer(j))
 		req.Header.Add("Authorization", "Bearer "+viper.GetString("token"))

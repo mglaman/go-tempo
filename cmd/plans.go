@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 )
@@ -52,7 +53,7 @@ var plansCmd = &cobra.Command{
 
 		token := viper.GetString("token")
 		username := viper.GetString("username")
-		url := "https://api.tempo.io/2/plans/user/" + username + "?from=" + queryTime.Format("2006-01-02") + "&to=" + queryTime.Format("2006-01-02")
+		url := "https://api.tempo.io/core/3/plans/user/" + url.QueryEscape(username) + "?from=" + queryTime.Format("2006-01-02") + "&to=" + queryTime.Format("2006-01-02")
 
 		req, _ := http.NewRequest("GET", url, nil)
 		req.Header.Add("Authorization", "Bearer "+token)
